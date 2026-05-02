@@ -1,0 +1,245 @@
+{{- $ns := .Values.namespace }}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $ns }}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opentelemetry-demo
+  namespace: {{ $ns }}
+
+# ===================== SERVICES =====================
+
+{{- range $name, $svc := .Values.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-{{ $name }}
+  namespace: {{ $ns }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $svc.port }}
+      targetPort: {{ $svc.port }}
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-{{ $name }}
+{{- end }}
+
+# ===================== DEPLOYMENTS =====================
+
+{{- range $name, $svc := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-{{ $name }}
+  namespace: {{ $ns }}
+spec:
+  replicas: {{ $.Values.replicaCount }}
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-{{ $name }}
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-{{ $name }}
+    spec:
+      serviceAccountName: opentelemetry-demo
+      containers:
+        - name: {{ $name }}
+          image: {{ index $.Values.images $name }}
+          imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $svc.port }}
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: {{ $name }}
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.name={{ $name }},service.namespace={{ $ns }}
+{{- end }}
+
+# ===================== KAFKA =====================
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-kafka
+  namespace: {{ $ns }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-kafka
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-kafka
+    spec:
+      containers:
+        - name: kafka
+          image: {{ .Values.images.kafka }}
+          ports:
+            - containerPort: 9092
+            - containerPort: 9093
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-kafka
+  namespace: {{ $ns }}
+spec:
+  ports:
+    - port: 9092
+      targetPort: 9092
+    - port: 9093
+      targetPort: 9093
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-kafka
+
+# ===================== VALKEY =====================
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-valkey
+  namespace: {{ $ns }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-valkey
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-valkey
+    spec:
+      containers:
+        - name: valkey
+          image: {{ .Values.images.valkey }}
+          ports:
+            - containerPort: 6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-valkey
+  namespace: {{ $ns }}
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-valkey
+
+# ===================== OTEL COLLECTOR =====================
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-otelcol
+  namespace: {{ $ns }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-otelcol
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-otelcol
+    spec:
+      containers:
+        - name: otelcol
+          image: {{ .Values.images.otelcol }}
+          ports:
+            - containerPort: 4317
+            - containerPort: 4318
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-otelcol
+  namespace: {{ $ns }}
+spec:
+  ports:
+    - port: 4317
+      targetPort: 4317
+    - port: 4318
+      targetPort: 4318
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-otelcol
+
+# ===================== FLAGD =====================
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-flagd
+  namespace: {{ $ns }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-flagd
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-flagd
+    spec:
+      containers:
+        - name: flagd
+          image: {{ .Values.images.flagd }}
+          args: ["start", "--uri", "file:/etc/flagd/demo.flagd.json"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flagd
+      volumes:
+        - name: config
+          configMap:
+            name: opentelemetry-demo-flagd-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-flagd
+  namespace: {{ $ns }}
+spec:
+  ports:
+    - port: 8013
+      targetPort: 8013
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-flagd
+
+# ===================== CONFIGMAP =====================
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentelemetry-demo-flagd-config
+  namespace: {{ $ns }}
+data:
+  demo.flagd.json: |
+    {
+      "flags": {
+        "adServiceFailure": {
+          "state": "ENABLED",
+          "variants": { "on": true, "off": false },
+          "defaultVariant": "off"
+        }
+      }
+    }

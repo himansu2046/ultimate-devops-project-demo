@@ -2,6 +2,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  namespace: shoping
   name: opentelemetry-demo
   labels:
 
@@ -15,6 +16,7 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-adservice
   labels:
     
@@ -38,6 +40,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-cartservice
   labels:
     
@@ -61,6 +64,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-checkoutservice
   labels:
     
@@ -84,6 +88,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-currencyservice
   labels:
     
@@ -107,6 +112,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-emailservice
   labels:
     
@@ -130,6 +136,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-flagd
   labels:
     
@@ -156,6 +163,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-frontend
   labels:
     
@@ -179,6 +187,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-frontendproxy
   labels:
     
@@ -202,6 +211,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-imageprovider
   labels:
     
@@ -225,6 +235,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-kafka
   labels:
     
@@ -251,6 +262,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-loadgenerator
   labels:
     
@@ -274,6 +286,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-paymentservice
   labels:
     
@@ -297,6 +310,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-productcatalogservice
   labels:
     
@@ -320,6 +334,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-quoteservice
   labels:
     
@@ -343,6 +358,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-recommendationservice
   labels:
     
@@ -366,6 +382,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-shippingservice
   labels:
     
@@ -389,6 +406,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-valkey
   labels:
     
@@ -412,6 +430,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-accountingservice
   labels:
     
@@ -476,6 +495,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-adservice
   labels:
     
@@ -542,6 +562,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-cartservice
   labels:
     
@@ -618,6 +639,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-checkoutservice
   labels:
     
@@ -704,6 +726,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-currencyservice
   labels:
     
@@ -766,6 +789,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-emailservice
   labels:
     
@@ -828,6 +852,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-flagd
   labels:
     
@@ -941,6 +966,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-frauddetectionservice
   labels:
     
@@ -1009,6 +1035,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-frontend
   labels:
     
@@ -1099,6 +1126,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-frontendproxy
   labels:
     
@@ -1195,6 +1223,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-imageprovider
   labels:
     
@@ -1257,6 +1286,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-kafka
   labels:
     
@@ -1325,6 +1355,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-loadgenerator
   labels:
     
@@ -1403,6 +1434,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-paymentservice
   labels:
     
@@ -1471,6 +1503,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-productcatalogservice
   labels:
     
@@ -1535,6 +1568,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-quoteservice
   labels:
     
@@ -1601,6 +1635,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-recommendationservice
   labels:
     
@@ -1671,6 +1706,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-shippingservice
   labels:    
     opentelemetry.io/name: opentelemetry-demo-shippingservice
@@ -1730,6 +1766,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-valkey
   labels:
     opentelemetry.io/name: opentelemetry-demo-valkey
@@ -1789,6 +1826,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  namespace: shoping
   name: opentelemetry-demo-flagd-config
   labels:
 
