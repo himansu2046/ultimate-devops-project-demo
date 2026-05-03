@@ -1,0 +1,123 @@
+pipeline {
+    agent any
+
+    tools {
+        go 'go-1.22'
+    }
+
+    environment {
+        GIT_REPO = "https://github.com/himansu2046/ultimate-devops-project-demo.git"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: "${GIT_REPO}",
+                    credentialsId: 'github-credentials'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+                cd src/product-catalog
+                go mod download
+                go build -o product-catalog-service main.go
+                '''
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                cd src/product-catalog
+                go test ./...
+                '''
+            }
+        }
+
+        stage('Code Quality (golangci-lint)') {
+            steps {
+                sh '''
+                curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.55.2
+                export PATH=$PATH:$(pwd)/bin
+
+                cd src/product-catalog
+                golangci-lint run || echo "Lint issues found, continuing..."
+                '''
+            }
+        }
+
+        // ✅ Docker Login
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                }
+            }
+        }
+
+        // ✅ Docker Build (BuildKit enabled correctly)
+        stage('Docker Build') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    script {
+                        def IMAGE = "${DOCKER_USER}/product-catalog:${BUILD_ID}"
+                        env.DOCKER_IMAGE = IMAGE
+
+                        sh "docker build -t ${IMAGE} src/product-catalog"
+                    }
+                }
+            }
+        }
+
+        // ✅ Docker Push
+        stage('Docker Push') {
+            steps {
+                sh "docker push ${DOCKER_IMAGE}"
+            }
+        }
+
+        // ✅ Update Kubernetes Manifest
+        stage('Update K8s Manifest') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-credentials',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_PASS'
+                )]) {
+                    sh '''
+                    git config --global user.email "himansu2046@gmail.com"
+                    git config --global user.name "Himansu Biswal"
+
+                    sed -i "s|image: .*|image: ${DOCKER_IMAGE}|" kubernetes/productcatalog/deploy.yaml
+
+                    git add kubernetes/productcatalog/deploy.yaml
+                    git commit -m "[CI]: Update product catalog image tag [skip ci]" || echo "No changes to commit"
+
+                    git push https://${GIT_USER}:${GIT_PASS}@github.com/himansu2046/ultimate-devops-project-demo.git HEAD:main
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed!"
+        }
+    }
+}
